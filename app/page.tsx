@@ -108,7 +108,7 @@ export default function Home() {
     const clean = question.trim();
     if (!clean) return;
     const answer = answerQuestion(clean);
-    const gain = answer === "是" ? 16 : answer === "不是" ? 7 : 3;
+    const gain = answer === "是" ? 16 : answer === "不是" ? 7 : 0;
     const nextProgress = Math.min(100, progress + gain);
     setMessages((old) => [...old, { from: "user", text: clean, answer: "" }, { from: "judge", text: answer, answer }]);
     setQuestion("");
