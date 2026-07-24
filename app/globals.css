@@ -34,8 +34,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .top-actions { display: flex; justify-self: end; align-items: center; gap: 12px; }
 .daily-chip { background: transparent; border: 1px solid rgba(222,211,189,.28); color: #e9e2d5; border-radius: 3px; padding: 9px 15px; cursor: pointer; }
 .daily-chip span { color: #b94d42; margin-right: 6px; }
-.icon-button { background: transparent; color: #eee6d8; border: 0; font-size: 24px; position: relative; cursor: pointer; padding: 7px; }
-.icon-button b { position: absolute; right: 0; top: 3px; display: grid; place-items: center; width: 15px; height: 15px; background: var(--rust); border-radius: 50%; font: 9px Arial; }
 
 .play-page { display: grid; grid-template-columns: minmax(310px, 34%) 1fr; min-height: calc(100vh - 78px); }
 .case-library { background: #e7e1d5; padding: 52px 3.6vw 60px 4.5vw; border-right: 1px solid var(--line); position: relative; overflow: hidden; }
@@ -65,8 +63,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .case-toolbar { display: flex; justify-content: space-between; align-items: center; color: #77786f; font: 11px Arial; letter-spacing: .12em; margin-bottom: 20px; }
 .case-toolbar i { font-style: normal; border-left: 1px solid #bbb7ae; margin-left: 10px; padding-left: 10px; color: #a09a8e; }
 .status-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--rust); margin-right: 7px; box-shadow: 0 0 0 4px rgba(159,56,47,.12); }
-.case-toolbar button { border: 0; background: transparent; cursor: pointer; color: #77786f; font-size: 12px; }
-.case-toolbar button.favorited { color: var(--rust); }
 .case-file { background: #efeadd; border: 1px solid #c9c0b0; min-height: 220px; padding: 32px clamp(30px,5vw,70px); position: relative; transform: rotate(-.25deg); box-shadow: 8px 9px 0 rgba(56,55,44,.05), 0 14px 28px rgba(56,48,37,.1); }
 .case-file:before { content:""; position:absolute; inset:0; background: repeating-linear-gradient(0deg,transparent,transparent 29px,rgba(75,79,69,.05) 30px); pointer-events:none; }
 .paperclip { position: absolute; width: 14px; height: 54px; border: 2px solid #7f847d; border-radius: 8px; right: 39px; top: -17px; transform: rotate(13deg); }
@@ -102,6 +98,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .question-form > div { display: flex; }
 .question-form input { flex:1; border:1px solid #bcb7ad; background:#faf8f2; padding:12px 14px; min-width:0; font-size:13px; }
 .question-form button { border:0; background:var(--rust); color:white; padding:0 19px; cursor:pointer; font-size:12px; letter-spacing:.08em; }
+.question-form button:disabled { cursor:wait; opacity:.7; }
 .question-form button:hover, .modal-card > button:last-child:hover, .generate-button:hover, .result-actions .primary:hover { background:#812a24; }
 .question-form small { display:block; margin-top:7px; color:#88837a; font-size:9px; }
 .question-form small b { color:#47584f; }
@@ -137,6 +134,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .forge-card textarea::placeholder { color:#aaa49a; }
 .textarea-foot { display:flex; justify-content:space-between; color:#9b958b; font-size:9px; margin-top:7px; }
 .generate-button { width:100%; margin-top:25px; border:0; background:var(--green); color:white; padding:16px; cursor:pointer; letter-spacing:.1em; }
+.generate-button:disabled, .result-actions button:disabled { cursor:wait; opacity:.65; }
 .generate-button span { color:#c36055; margin-right:7px; }
 .generate-button i { font:normal 9px Arial; opacity:.55; margin-left:12px; }
 .privacy-note { text-align:center; font-size:9px; color:#aaa397; margin-top:11px; }
@@ -168,6 +166,9 @@ footer { min-height:54px; background:#15211f; color:#8f9994; display:flex; align
 .modal-card > button:last-child { border:0; background:var(--green); color:white; padding:13px 25px; margin-top:12px; cursor:pointer; }
 .badge-medal { width:100px; height:100px; border-radius:50%; background:#9d3b32; color:#f5e4bc; border:5px double #e2c889; display:grid; place-items:center; margin:0 auto 15px; box-shadow:0 0 0 8px #d8c7a5; }
 .badge-medal span { font:bold 20px Georgia; }
+.badge-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
+.badge-actions button { padding:12px 10px; cursor:pointer; border:1px solid var(--rust); background:transparent; color:var(--rust); font-size:11px; }
+.badge-actions button + button { background:var(--green); border-color:var(--green); color:white; }
 .toast { position:fixed; z-index:100; bottom:25px; left:50%; transform:translateX(-50%); background:#21342f; color:white; padding:13px 22px; box-shadow:0 9px 30px rgba(0,0,0,.25); font-size:12px; animation:toastIn .25s ease; }
 @keyframes toastIn { from { opacity:0; transform:translate(-50%,10px); } }
 

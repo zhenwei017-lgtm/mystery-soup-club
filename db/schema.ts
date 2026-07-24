@@ -1,4 +1,15 @@
-// Intentionally empty by default.
-// Add Drizzle tables here when the site actually needs a database.
-// See examples/d1/db/schema.ts for an opt-in example.
-export {};
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+export const customSoups = sqliteTable("custom_soups", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  category: text("category").notNull(),
+  difficulty: text("difficulty").notNull().default("新作"),
+  playTime: text("play_time").notNull().default("约 10 分钟"),
+  surface: text("surface").notNull(),
+  truth: text("truth").notNull(),
+  hint: text("hint").notNull(),
+  keyFacts: text("key_facts").notNull(),
+  isPublic: integer("is_public", { mode: "boolean" }).notNull().default(false),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+});
