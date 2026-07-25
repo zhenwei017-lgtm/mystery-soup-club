@@ -1,98 +1,129 @@
-# vinext-starter
+# 谜雾汤馆 Mystery Soup Club
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+> 让每一次提问都推动真相，让每一位玩家都能成为谜题创作者。
 
-## Prerequisites
+[在线试玩](https://mystery-soup-club.sryunnwei.chatgpt.site) · [功能亮点](#为什么它不只是一个海龟汤题库) · [本地运行](#本地运行)
 
-- Node.js `>=22.13.0`
+**谜雾汤馆**是一款面向朋友聚会的沉浸式 AI 海龟汤网页游戏。玩家从一段看似矛盾的“汤面”出发，用只能回答「是 / 不是 / 无关」的问题逐步逼近真相；AI 不仅担当主持人，还会理解玩家问题背后的语义，实时判断他们究竟揭开了多少关键事实。
 
-## Quick Start
+与常见的静态题库不同，谜雾汤馆把玩家从“答题者”变成了“共创者”：任何人都可以输入完整故事，或只写下一两句灵感，由 AI 提炼成凝练、悬疑且留有推理空间的新汤面，修改后直接加入公共案卷库。
+
+## 为什么它不只是一个海龟汤题库
+
+### 1. 看得见的推理进度
+
+传统海龟汤只能靠主持人的主观感觉判断“猜到哪了”。谜雾汤馆将每个汤底拆分为一组带权重的独立关键事实，并让 AI 判断玩家的问题是否真正命中了其中某一项。
+
+- 问题与汤底一致，回答「是」
+- 问题与汤底矛盾，回答「不是」
+- 只有无法由汤底支持或否定、且不影响核心因果的内容，才回答「无关」
+- 只有玩家明确提出并确认了新的关键事实，进度才会前进
+- 重复提问、泛泛提及和无关问题不会“刷进度”
+
+玩家看到的始终只有百分比，不会提前暴露关键线索。
+
+```mermaid
+flowchart LR
+    A["玩家自然语言提问"] --> B["AI 理解问题中的实际命题"]
+    B --> C["对照完整汤底判断<br/>是 / 不是 / 无关"]
+    C --> D{"明确揭开新关键事实？"}
+    D -- "否" --> E["进度保持不变"]
+    D -- "是" --> F["记录事实并累加权重"]
+    F --> G["实时更新推理百分比"]
+```
+
+这也是项目最核心的产品与技术难点：**进度不是消息数量，也不是关键词命中率，而是玩家已经揭开的关键事实占全部真相的比例。**
+
+### 2. 100% 推理成就
+
+当玩家依靠自己的提问揭开全部核心事实、进度达到 100% 时，系统会颁发专属成就勋章。它既是对完整推理过程的即时奖励，也为朋友间分享战绩、比较解谜表现提供了自然的传播节点。
+
+玩家也可以随时选择：
+
+- 获取一条不直接泄底的提示
+- 直接查看完整汤底
+- 在独立推理至 100% 后领取成就
+
+### 3. 玩家可以反向创造谜题
+
+市面上的海龟汤产品大多围绕既有题库展开，玩家与内容的关系通常止于“选择—提问—揭晓”。谜雾汤馆增加了完整的自定义汤面流程：
+
+1. 输入完整故事，或一两句简单灵感
+2. AI 自动识别适合的反常点与悬念切口
+3. 生成标题、分类和凝练汤面，同时隐藏关键因果
+4. 玩家可以自由修改，或要求 AI 换一个角度重新生成
+5. 勾选公开后，新作品立即进入公共案卷库，供所有玩家推理
+
+这让题库不再是固定内容，而是会随着玩家参与持续生长的共创社区。
+
+## 核心体验
+
+- **沉浸式侦探界面**：以案卷库、案件标签和推理对话营造聚会推理氛围
+- **严格三态裁判**：AI 对玩家只回复「是 / 不是 / 无关」
+- **语义级事实判断**：支持同义表达、口语、省略和不同措辞，不要求复述标准答案
+- **动态进度计算**：按关键事实权重累计，只在真正取得推理突破时前进
+- **题材分类**：爱情、亲情、友情、灵异、恐怖等多种主题
+- **今日谜题**：快速进入每日推荐案卷
+- **提示与揭晓**：玩家可随时控制推理难度和游戏节奏
+- **AI 创作助手**：自动生成标题、分类、汤面、提示与关键事实
+- **公共案卷库**：获准公开的玩家作品持久保存，并可立即被其他人游玩
+- **无需登录**：打开网页即可开始，适合朋友聚会快速组局
+
+## 推理进度如何工作
+
+每道谜题在汤底之外，还包含若干条互不重复的关键事实及其权重。例如人物关系、行为动机、关键事件和最终因果，分别构成完整真相的一部分。
+
+每次提问后，AI 会完成两项彼此独立的任务：
+
+1. 根据完整汤底判断问题的主要命题是「是 / 不是 / 无关」
+2. 判断玩家是否在这句话中**明确提出并确认**了尚未发现的关键事实
+
+系统只保存已发现事实的 ID，并按权重求和：
+
+```text
+推理进度 = 已发现关键事实权重之和 / 全部关键事实权重之和 × 100%
+```
+
+为了减少误判，判定规则还会限制单次问题可匹配的事实数量，并禁止 AI 把内部推导出的上下游事实一并计入。这样可以避免“只问了一个宽泛问题，进度却突然跳到 100%”。
+
+## 技术实现
+
+- **前端与服务端**：React、Next.js、TypeScript、vinext
+- **AI 裁判与生成**：DeepSeek Chat Completions API
+- **数据持久化**：Cloudflare D1、Drizzle ORM
+- **部署运行**：Cloudflare Workers / OpenAI Sites
+
+API Key 仅存在于服务端环境变量中，不会发送到浏览器，也不会提交到 Git 仓库。
+
+## 本地运行
+
+需要 Node.js `>=22.13.0` 和可用的 DeepSeek API Key。
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
-npm run build
 ```
 
-This starter does not use `wrangler.jsonc`.
+在 `.env.local` 中配置：
 
-## Included Shape
-
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```env
+DEEPSEEK_API_KEY=你的密钥
+DEEPSEEK_MODEL=deepseek-v4-pro
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+常用命令：
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+```bash
+npm run dev      # 启动本地开发环境
+npm run build    # 构建并检查项目
+npm run lint     # 代码检查
+```
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+## 产品愿景
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+海龟汤最迷人的地方，并不是听到答案的那一刻，而是一群人不断提出假设、推翻假设，最终共同拼出真相的过程。
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+谜雾汤馆希望让 AI 成为更准确、更克制的主持人：它不抢先解释，不泄露答案，只在玩家真正取得突破时，让那条进度向前移动。同时，我们也希望每一个听过故事、做过怪梦或突然冒出奇怪念头的人，都能轻松把它变成下一桌玩家的谜题。
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
-
-## Useful Commands
-
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
-
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+如果你喜欢这个项目，欢迎体验、分享，或提交你的下一碗“汤”。
